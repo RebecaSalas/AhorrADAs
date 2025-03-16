@@ -1,5 +1,9 @@
 // Selección de elementos del DOM
 const elementos = {
+    // Elementos de navegación (Menú)
+    enlacesMenu: document.querySelectorAll('header nav a'), // Todos los enlaces del menú
+    secciones: document.querySelectorAll('main section'), // Todas las secciones de la página
+    //// Sección de Balance ////
     iconoHamburguesa: document.getElementById('hamburger-icon'), // Ícono del menú hamburguesa
     iconoCerrar: document.getElementById('close-icon'), // Ícono para cerrar el menú
     menuModal: document.getElementById('menu-modal'), // Modal del menú en modo responsive
@@ -21,17 +25,19 @@ const elementos = {
     filtroTipo: document.querySelector('#filter-tipo'), // Filtro por tipo de operación
     filtroCategoria: document.querySelector('#filter-categoria'), // Filtro por categoría de operación
     filtroFecha: document.querySelector('#filter-fecha'), // Filtro por fecha de operación
-    filtroOrden: document.querySelector('#filter-ordenar') // Filtro para ordenar las operaciones
+    filtroOrden: document.querySelector('#filter-ordenar'), // Filtro para ordenar las operaciones
 };
 
+//// Sección de Balance ////
 // Almacenar operaciones
 let operaciones = []; // Array para almacenar las operaciones
 
-// Funciones de almacenamiento
-const guardarOperaciones = () => localStorage.setItem('operaciones', JSON.stringify(operaciones)); // Guarda las operaciones en localStorage
+// Función para guardar operaciones en localStorage
+const guardarOperaciones = () => localStorage.setItem('operaciones', JSON.stringify(operaciones));
 
+// Función para cargar operaciones desde localStorage
 const cargarOperaciones = () => {
-    const operacionesGuardadas = localStorage.getItem('operaciones'); // Carga las operaciones desde localStorage
+    const operacionesGuardadas = localStorage.getItem('operaciones');
     if (operacionesGuardadas) {
         operaciones = JSON.parse(operacionesGuardadas);
         aplicarFiltros(); // Aplica los filtros después de cargar las operaciones
@@ -41,9 +47,9 @@ const cargarOperaciones = () => {
 
 // Función para alternar el menú hamburguesa
 const alternarMenu = () => {
-    elementos.menuModal.classList.toggle('hidden'); // Muestra/oculta el menú modal
-    elementos.iconoHamburguesa.classList.toggle('hidden'); // Muestra/oculta el ícono del menú hamburguesa
-    elementos.iconoCerrar.classList.toggle('hidden'); // Muestra/oculta el ícono de cerrar
+    elementos.menuModal.classList.toggle('hidden');
+    elementos.iconoHamburguesa.classList.toggle('hidden');
+    elementos.iconoCerrar.classList.toggle('hidden');
 };
 
 elementos.iconoHamburguesa.addEventListener('click', alternarMenu);
@@ -51,13 +57,13 @@ elementos.iconoCerrar.addEventListener('click', alternarMenu);
 
 // Funciones para abrir y cerrar el modal de nueva operación
 const abrirModal = () => {
-    elementos.modalNuevaOperacion.classList.remove('hidden'); // Muestra el modal de nueva operación
-    document.getElementById('contenido-principal').classList.add('hidden'); // Oculta el contenido principal
+    elementos.modalNuevaOperacion.classList.remove('hidden');
+    document.getElementById('contenido-principal').classList.add('hidden');
 };
 
 const cerrarModal = () => {
-    elementos.modalNuevaOperacion.classList.add('hidden'); // Oculta el modal de nueva operación
-    document.getElementById('contenido-principal').classList.remove('hidden'); // Muestra el contenido principal
+    elementos.modalNuevaOperacion.classList.add('hidden');
+    document.getElementById('contenido-principal').classList.remove('hidden');
 };
 
 elementos.abrirModalBtn.addEventListener('click', abrirModal);
@@ -74,26 +80,26 @@ const agregarOperacion = (evento) => {
         categoria: document.getElementById('categoria').value,
         fecha: document.getElementById('fecha').value,
     };
-    operaciones.push(nuevaOperacion); // Añade la nueva operación al array
-    guardarOperaciones(); // Guarda las operaciones en localStorage
-    aplicarFiltros(); // Aplica los filtros después de agregar la operación
-    actualizarBalance(); // Actualiza el balance después de agregar la operación
-    cerrarModal(); // Cierra el modal de nueva operación
-    elementos.formularioNuevaOperacion.reset(); // Resetea el formulario de nueva operación
+
+    operaciones.push(nuevaOperacion);
+    guardarOperaciones();
+    aplicarFiltros();
+    cerrarModal();
+    elementos.formularioNuevaOperacion.reset();
 };
 
 elementos.formularioNuevaOperacion.addEventListener('submit', agregarOperacion);
 
-// Función para editar una operación existente
+// Función para editar una operación
 const editarOperacion = (id) => {
-    const operacion = operaciones.find(op => op.id === id); // Encuentra la operación a editar
+    const operacion = operaciones.find(op => op.id === id);
     document.getElementById('descripcion').value = operacion.descripcion;
     document.getElementById('monto').value = operacion.monto;
     document.getElementById('tipo').value = operacion.tipo;
     document.getElementById('categoria').value = operacion.categoria;
     document.getElementById('fecha').value = operacion.fecha;
 
-    abrirModal(); // Abre el modal con los datos de la operación a editar
+    abrirModal();
 
     const guardarEdicion = (evento) => {
         evento.preventDefault();
@@ -103,10 +109,9 @@ const editarOperacion = (id) => {
         operacion.categoria = document.getElementById('categoria').value;
         operacion.fecha = document.getElementById('fecha').value;
 
-        guardarOperaciones(); // Guarda las operaciones editadas en localStorage
-        aplicarFiltros(); // Aplica los filtros después de editar la operación
-        actualizarBalance(); // Actualiza el balance después de editar la operación
-        cerrarModal(); // Cierra el modal de nueva operación
+        guardarOperaciones();
+        aplicarFiltros();
+        cerrarModal();
         elementos.formularioNuevaOperacion.removeEventListener('submit', guardarEdicion);
         elementos.formularioNuevaOperacion.addEventListener('submit', agregarOperacion);
     };
@@ -117,23 +122,17 @@ const editarOperacion = (id) => {
 
 // Función para eliminar una operación
 const eliminarOperacion = (id) => {
-    operaciones = operaciones.filter(op => op.id !== id); // Filtra las operaciones para eliminar la operación seleccionada
-    guardarOperaciones(); // Guarda las operaciones después de eliminar
-    aplicarFiltros(); // Aplica los filtros después de eliminar la operación
-    actualizarBalance(); // Actualiza el balance después de eliminar la operación
+    operaciones = operaciones.filter(op => op.id !== id);
+    guardarOperaciones();
+    aplicarFiltros();
 };
 
-// Función para renderizar las operaciones en la interfaz
+// Función para renderizar operaciones en la interfaz
 const renderizarOperaciones = (ops) => {
     elementos.itemsOperaciones.innerHTML = ''; // Limpia la lista de operaciones
     ops.forEach(operacion => {
         const nuevaOperacionDiv = document.createElement('div');
         nuevaOperacionDiv.classList.add('operacion', 'grid', 'grid-cols-5', 'gap-4', 'py-2', 'border-b', 'border-gray-200');
-        nuevaOperacionDiv.dataset.tipo = operacion.tipo; // Añade el tipo de operación como dato
-        nuevaOperacionDiv.dataset.categoria = operacion.categoria; // Añade la categoría de operación como dato
-        nuevaOperacionDiv.dataset.fecha = operacion.fecha; // Añade la fecha de operación como dato
-        nuevaOperacionDiv.dataset.monto = operacion.monto; // Añade el monto de operación como dato
-        nuevaOperacionDiv.dataset.descripcion = operacion.descripcion; // Añade la descripción de operación como dato
         nuevaOperacionDiv.innerHTML = `
             <div>${operacion.descripcion}</div>
             <div>${operacion.categoria}</div>
@@ -146,38 +145,43 @@ const renderizarOperaciones = (ops) => {
                 <button class="eliminar-btn text-red-500 hover:text-black font-bold py-1 px-2 rounded bg-white cursor-pointer">Eliminar</button>
             </div>
         `;
-        // Asigna los eventos de edición y eliminación a los botones correspondientes
+
+        // Asignar eventos a los botones de edición y eliminación
         nuevaOperacionDiv.querySelector('.editar-btn').addEventListener('click', () => editarOperacion(operacion.id));
         nuevaOperacionDiv.querySelector('.eliminar-btn').addEventListener('click', () => eliminarOperacion(operacion.id));
-        elementos.itemsOperaciones.appendChild(nuevaOperacionDiv); // Añade la operación a la lista en la interfaz
+        elementos.itemsOperaciones.appendChild(nuevaOperacionDiv);
     });
 
-    const noOperaciones = ops.length === 0; // Verifica si no hay operaciones
-    elementos.mensajeSinResultados.classList.toggle('hidden', !noOperaciones); // Muestra/oculta el mensaje de "Sin resultados"
-    elementos.mensajeCambiarFiltros.classList.toggle('hidden', !noOperaciones); // Muestra/oculta el mensaje de "Cambiar filtros"
-    elementos.operationsPlaceholder.classList.toggle('hidden', !noOperaciones); // Muestra/oculta el placeholder de operaciones
-    elementos.listaOperaciones.classList.toggle('hidden', noOperaciones); // Muestra/oculta la lista de operaciones
+    const noOperaciones = ops.length === 0;
+    elementos.mensajeSinResultados.classList.toggle('hidden', !noOperaciones);
+    elementos.mensajeCambiarFiltros.classList.toggle('hidden', !noOperaciones);
+    elementos.operationsPlaceholder.classList.toggle('hidden', !noOperaciones);
+    elementos.listaOperaciones.classList.toggle('hidden', noOperaciones);
 };
 
-// Función para aplicar filtros y ordenar operaciones
+// Función para aplicar filtros y actualizar balance
 const aplicarFiltros = () => {
-    let operacionesFiltradas = operaciones; // Copia del array de operaciones
+    let operacionesFiltradas = operaciones;
 
+    // Filtrar por tipo
     const tipo = elementos.filtroTipo.value;
     if (tipo !== 'todos') {
-        operacionesFiltradas = operacionesFiltradas.filter(op => op.tipo === tipo); // Filtra por tipo
+        operacionesFiltradas = operacionesFiltradas.filter(op => op.tipo === tipo);
     }
 
+    // Filtrar por categoría
     const categoria = elementos.filtroCategoria.value;
     if (categoria !== 'todas') {
-        operacionesFiltradas = operacionesFiltradas.filter(op => op.categoria === categoria); // Filtra por categoría
+        operacionesFiltradas = operacionesFiltradas.filter(op => op.categoria === categoria);
     }
 
+    // Filtrar por fecha
     const fecha = elementos.filtroFecha.value;
     if (fecha) {
-        operacionesFiltradas = operacionesFiltradas.filter(op => new Date(op.fecha) >= new Date(fecha)); // Filtra por fecha
+        operacionesFiltradas = operacionesFiltradas.filter(op => new Date(op.fecha) >= new Date(fecha));
     }
 
+    // Ordenar operaciones
     const ordenar = elementos.filtroOrden.value;
     operacionesFiltradas.sort((a, b) => {
         if (ordenar === 'fecha-reciente') return new Date(b.fecha) - new Date(a.fecha);
@@ -189,10 +193,43 @@ const aplicarFiltros = () => {
         return 0;
     });
 
-    renderizarOperaciones(operacionesFiltradas); // Renderiza las operaciones filtradas y ordenadas
+    // Renderizar las operaciones filtradas
+    renderizarOperaciones(operacionesFiltradas);
+
+    // Actualizar el balance según las operaciones filtradas
+    actualizarBalanceFiltrado(operacionesFiltradas);
 };
 
-// Agregar eventos a los filtros
+// Función para actualizar el balance basado en las operaciones filtradas
+const actualizarBalanceFiltrado = (operacionesFiltradas) => {
+    const ganancias = operacionesFiltradas
+        .filter(op => op.tipo === 'ganancia')
+        .reduce((total, op) => total + op.monto, 0);
+
+    const gastos = operacionesFiltradas
+        .filter(op => op.tipo === 'gasto')
+        .reduce((total, op) => total + op.monto, 0);
+
+    const total = ganancias - gastos;
+
+    // Actualizar visualmente los elementos de balance
+    elementos.balanceGanancias.textContent = `+$${ganancias.toFixed(2)}`;
+    elementos.balanceGastos.textContent = `-$${gastos.toFixed(2)}`;
+    elementos.balanceTotal.textContent = total >= 0 
+        ? `+$${total.toFixed(2)}` 
+        : `-$${Math.abs(total).toFixed(2)}`;
+
+    // Actualizar los colores del balance total
+    if (total >= 0) {
+        elementos.balanceTotal.classList.remove('text-red-500');
+        elementos.balanceTotal.classList.add('text-green-500');
+    } else {
+        elementos.balanceTotal.classList.remove('text-green-500');
+        elementos.balanceTotal.classList.add('text-red-500');
+    }
+};
+
+// Eventos para actualizar el balance y operaciones al cambiar los filtros
 elementos.filtroTipo.addEventListener('change', aplicarFiltros);
 elementos.filtroCategoria.addEventListener('change', aplicarFiltros);
 elementos.filtroFecha.addEventListener('change', aplicarFiltros);
@@ -201,36 +238,73 @@ elementos.filtroOrden.addEventListener('change', aplicarFiltros);
 // Función para alternar la visibilidad de los filtros
 const alternarFiltros = () => {
     const isHidden = elementos.contenidoFiltros.classList.contains('hidden');
-    elementos.contenidoFiltros.classList.toggle('hidden'); // Muestra/oculta el contenido de los filtros
-    elementos.mostrarOcultarFiltrosBtn.textContent = isHidden ? 'Ocultar filtros' : 'Mostrar filtros'; // Cambia el texto del botón
+    elementos.contenidoFiltros.classList.toggle('hidden');
+    elementos.mostrarOcultarFiltrosBtn.textContent = isHidden ? 'Ocultar filtros' : 'Mostrar filtros';
 };
 
 elementos.mostrarOcultarFiltrosBtn.addEventListener('click', alternarFiltros);
 
-// Función para actualizar el balance
+// Función para actualizar el balance total (inicial o sin filtros)
 const actualizarBalance = () => {
-    const ingresos = operaciones.filter(op => op.tipo === 'ganancia').reduce((total, op) => total + op.monto, 0); // Calcula las ganancias
-    const gastos = operaciones.filter(op => op.tipo === 'gasto').reduce((total, op) => total + op.monto, 0); // Calcula los gastos
-    const total = ingresos - gastos; // Calcula el balance total
+    const ingresos = operaciones
+        .filter(op => op.tipo === 'ganancia')
+        .reduce((total, op) => total + op.monto, 0);
 
-    elementos.balanceGanancias.textContent = `+$${ingresos.toFixed(2)}`; // Actualiza el texto de ganancias
-    elementos.balanceGastos.textContent = `-$${gastos.toFixed(2)}`; // Actualiza el texto de gastos
+    const gastos = operaciones
+        .filter(op => op.tipo === 'gasto')
+        .reduce((total, op) => total + op.monto, 0);
+
+    const total = ingresos - gastos;
+
+    // Actualizar visualmente los elementos de balance
+    elementos.balanceGanancias.textContent = `+$${ingresos.toFixed(2)}`;
+    elementos.balanceGastos.textContent = `-$${gastos.toFixed(2)}`;
+    elementos.balanceTotal.textContent = total >= 0 
+        ? `+$${total.toFixed(2)}` 
+        : `-$${Math.abs(total).toFixed(2)}`;
+
+    // Cambiar colores del balance total
     if (total >= 0) {
-        elementos.balanceTotal.textContent = `+$${total.toFixed(2)}`; // Actualiza el texto del balance total positivo
         elementos.balanceTotal.classList.remove('text-red-500');
         elementos.balanceTotal.classList.add('text-green-500');
     } else {
-        elementos.balanceTotal.textContent = `-$${Math.abs(total).toFixed(2)}`; // Actualiza el texto del balance total negativo
         elementos.balanceTotal.classList.remove('text-green-500');
         elementos.balanceTotal.classList.add('text-red-500');
     }
 };
 
-// Inicializar
+// Inicializar aplicación al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    cargarOperaciones(); // Carga las operaciones desde localStorage
-    elementos.contenidoFiltros.classList.remove('hidden'); // Muestra los filtros al cargar la página
-    elementos.mostrarOcultarFiltrosBtn.textContent = 'Ocultar filtros'; // Ajusta el texto del botón de filtros
-    aplicarFiltros(); // Aplica los filtros al cargar la página
-    actualizarBalance(); // Actualiza el balance al cargar la página
+    cargarOperaciones();
+    aplicarFiltros(); // Aplicar filtros al cargar
+    actualizarBalance(); // Actualizar balance inicial
 });
+
+// Navegación del menú 
+// Mostrar la sección seleccionada
+const mostrarSeccion = (evento) => {
+    evento.preventDefault(); // Evitar el comportamiento por defecto del enlace
+
+    const idSeccion = evento.target.getAttribute('href').replace('#', ''); // Obtener el ID sin el símbolo #
+    const seccionSeleccionada = document.getElementById(idSeccion); // Seleccionar la sección correspondiente
+
+    // Ocultar todas las secciones
+    elementos.secciones.forEach(seccion => seccion.classList.add('hidden'));
+
+    // Mostrar solo la sección seleccionada
+    if (seccionSeleccionada) {
+        seccionSeleccionada.classList.remove('hidden');
+    }
+};
+
+// Asignar el evento de clic a cada enlace del menú
+elementos.enlacesMenu.forEach(enlace => enlace.addEventListener('click', mostrarSeccion));
+
+
+
+
+
+
+
+
+
